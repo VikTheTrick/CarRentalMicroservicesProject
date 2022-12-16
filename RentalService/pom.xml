@@ -41,6 +41,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.cloudimpl</groupId>
+            <artifactId>errorcode-generator</artifactId>
+            <version>2.0.0.22</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
