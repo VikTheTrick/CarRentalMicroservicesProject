@@ -1,9 +1,7 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dtos.ClientCreateDto;
-import com.example.userservice.dtos.ManagerCreateDto;
-import com.example.userservice.dtos.TokenRequestDto;
-import com.example.userservice.dtos.TokenResponseDto;
+import com.example.userservice.dtos.*;
+import com.example.userservice.security.CheckSecurity;
 import com.example.userservice.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -35,6 +33,16 @@ public class UserController {
     public ResponseEntity<TokenResponseDto> loginUser(@RequestBody TokenRequestDto tokenRequestDto) {
         return new ResponseEntity<>(userService.login(tokenRequestDto), HttpStatus.OK);
     }
+
+    @ApiOperation(value = "restrict")
+    @GetMapping("/restrict/{email}")
+    @CheckSecurity(roles = {"ROLE_ADMIN"})
+    public ResponseEntity restrictUser(@RequestHeader("Authorization") String authorization,@PathVariable(value="email") String email)
+    {
+        return new ResponseEntity<>(userService.restrictUser(email), HttpStatus.OK);
+    }
+
+
     @GetMapping
     public String test()
     {

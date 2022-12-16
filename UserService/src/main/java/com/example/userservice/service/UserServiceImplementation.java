@@ -1,10 +1,8 @@
 package com.example.userservice.service;
 
 import com.example.userservice.domain.User;
-import com.example.userservice.dtos.ClientCreateDto;
-import com.example.userservice.dtos.ManagerCreateDto;
-import com.example.userservice.dtos.TokenRequestDto;
-import com.example.userservice.dtos.TokenResponseDto;
+import com.example.userservice.domain.userTypes.Admin;
+import com.example.userservice.dtos.*;
 import com.example.userservice.exception.NotFoundException;
 import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.repository.UserRepository;
@@ -12,11 +10,15 @@ import com.example.userservice.security.service.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Date;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -32,6 +34,9 @@ public class UserServiceImplementation implements UserService {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        User a = userRepository.getAllByEmail("m@gmail.com");
+        if(a == null)
+        userRepository.save(new Admin("mare","123","m@gmail.com",Date.valueOf("2001-2-22"),"marko", "lekic"));
     }
 
 
@@ -69,8 +74,10 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public boolean restrictUser(String email) {
-        return false;
+    public ResponseEntity restrictUser(String email) {
+        userRepository.setUserInfoByEmail(email);
+        return new ResponseEntity(HttpStatus.ACCEPTED);
+
     }
 
     @Override
@@ -81,10 +88,13 @@ public class UserServiceImplementation implements UserService {
                 .orElseThrow(() -> new NotFoundException(String
                         .format("User with username: %s and password: %s not found.", tokenRequestDto.getEmail(),
                                 tokenRequestDto.getPassword())));
+        if(user.getRestricted())
+            return new TokenResponseDto("This account has been restricted");
         //Create token payload
         Claims claims = Jwts.claims();
         claims.put("id", user.getId());
-        claims.put("role", "Admin");
+        String userRole = "ROLE_" + user.getClass().getSimpleName().toUpperCase(Locale.ROOT);
+        claims.put("role", userRole);
         //Generate token
         return new TokenResponseDto(tokenService.generate(claims));
     }

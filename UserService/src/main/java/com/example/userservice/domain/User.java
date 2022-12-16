@@ -19,7 +19,7 @@ public abstract class User{
 
     private String username;
     private String password;
-
+    private Boolean restricted = false;
     @Column(unique=true)
     private String email;
     private Date dateOfBirth;
