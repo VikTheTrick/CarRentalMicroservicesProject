@@ -1,32 +1,30 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.domain.User;
-import com.example.userservice.domain.userTypes.Admin;
-import com.example.userservice.domain.userTypes.Client;
-import com.example.userservice.repository.UserRepository;
+import com.example.userservice.dtos.ClientCreateDto;
+import com.example.userservice.dtos.ManagerCreateDto;
+import com.example.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.sql.Date;
-import java.time.LocalDateTime;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    private UserRepository userRepository;
+    private UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<User> add()
+    @PostMapping("/registerClient")
+    public ResponseEntity<ClientCreateDto> add(@RequestBody ClientCreateDto clientCreateDtoCreateDto)
     {
-        return new ResponseEntity<>(userRepository.save(new Client("aki","baki","sss", new Date(25112006),"sss","kusi",111111,0.8)), HttpStatus.CREATED);
+        return new ResponseEntity(userService.addClient(clientCreateDtoCreateDto), HttpStatus.CREATED);
+    }
+    @PostMapping("/registerManager")
+    public ResponseEntity<ClientCreateDto> add(@RequestBody ManagerCreateDto managerCreateDtoCreateDto)
+    {
+        return new ResponseEntity(userService.addManager(managerCreateDtoCreateDto), HttpStatus.CREATED);
     }
 
     @GetMapping
