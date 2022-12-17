@@ -1,6 +1,7 @@
 package com.example.userservice.controller;
 
 import com.example.userservice.dtos.*;
+import com.example.userservice.dtos.userUpdate.UserUpdateDto;
 import com.example.userservice.security.CheckSecurity;
 import com.example.userservice.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -42,10 +43,19 @@ public class UserController {
         return new ResponseEntity<>(userService.restrictUser(email), HttpStatus.OK);
     }
 
-
-    @GetMapping
-    public String test()
+    @ApiOperation(value = "update user params")
+    @PostMapping("/update")
+    public ResponseEntity updateUser(@RequestHeader("Authorization") String authorization, @RequestBody UserUpdateDto userUpdateDto)
     {
-        return "sss";
+      return userService.updateUser(authorization, userUpdateDto);
     }
+
+    @ApiOperation(value = "add/update rank")
+    @PostMapping("/addRank")
+    @CheckSecurity(roles = {"ROLE_ADMIN"})
+    public ResponseEntity addRank(@RequestHeader("Authorization") String authorization, @RequestBody AddRankDto addRankDto )
+    {
+        return userService.addRank(addRankDto);
+    }
+
 }

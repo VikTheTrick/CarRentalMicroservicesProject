@@ -1,7 +1,6 @@
 package com.example.userservice.repository;
 
 import com.example.userservice.domain.User;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +14,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Query("update User u set u.restricted = true")
-    void setUserInfoByEmail(String email);
+    void setUserRestrictedByEmail(String email);
+
+    Optional<User> findById(Long id);
+
+
 
 
 }

@@ -19,4 +19,6 @@ public class UserMapper {
         return new Manager(managerCreateDto.getUsername(), managerCreateDto.getPassword(), managerCreateDto.getEmail(), managerCreateDto.getDateOfBirth(), managerCreateDto.getName(),
                 managerCreateDto.getSurname(), managerCreateDto.getHireDate(), managerCreateDto.getCompanyName());
     }
+
+
 }

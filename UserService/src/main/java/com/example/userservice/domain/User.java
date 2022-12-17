@@ -27,6 +27,8 @@ public abstract class User{
     private String surname;
 
 
+
+
     public User(String username, String password, String email, Date dateOfBirth, String name, String surname) {
         this.username = username;
         this.password = password;
