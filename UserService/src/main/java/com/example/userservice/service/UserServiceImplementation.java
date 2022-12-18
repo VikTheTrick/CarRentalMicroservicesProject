@@ -48,7 +48,7 @@ public class UserServiceImplementation implements UserService {
 
 
     @Override
-    public ClientCreateDto addClient(ClientCreateDto clientCreateDto) {
+    public ResponseEntity<ClientCreateDto> addClient(ClientCreateDto clientCreateDto) {
        /* User check = userRepository.getAllByEmail(clientCreateDto.getEmail());
         if(check != null)
         {
@@ -56,15 +56,14 @@ public class UserServiceImplementation implements UserService {
         }
         //posalji mejl preko notification servisa
         */
-        clientCreateDto.setPassword(clientCreateDto.getPassword());
-
+        clientCreateDto.setRank(rankRepository.getByName("rank0").get());
 
         try {
             userRepository.save(userMapper.CreateClientDtoToClient(clientCreateDto));
-            return clientCreateDto;
+            return new ResponseEntity<>(clientCreateDto,HttpStatus.ACCEPTED);
         }catch (Exception e)
         {
-            return null;
+            return new ResponseEntity<>(new ClientCreateDto(), HttpStatus.BAD_REQUEST);
         }
         }
 
@@ -111,34 +110,47 @@ public class UserServiceImplementation implements UserService {
         Claims claims = tokenService.parseToken(authToken.split(" ")[1]);
         String userRole = claims.get("role", String.class);
         userUpdateDto.setId(Long.valueOf(claims.get("id",Integer.class)));
+        if(!(userRole.equals("ROLE_ADMIN") || userRole.equals("ROLE_CLIENT")|| userRole.equals("ROLE_MANAGER")))
+            return new ResponseEntity("Error, you do not have proper permissions",HttpStatus.UNAUTHORIZED);
+
+        Optional<User> updatedClient = userRepository.findById(userUpdateDto.getId());
+
+
         if(userRole.equals("ROLE_ADMIN"))
         {
-            UserUpdateDto adminUpdateObject = userUpdateDto;
-            Admin updatedAdmin = new Admin(adminUpdateObject.getUsername(), adminUpdateObject.getPassword(),
-                    adminUpdateObject.getEmail(), adminUpdateObject.getDateOfBirth()
-                    , adminUpdateObject.getName(), adminUpdateObject.getSurname());
-            return new ResponseEntity(userRepository.save(updatedAdmin), HttpStatus.ACCEPTED);
+            Admin c = (Admin) updatedClient.get();
+            c.setPassword(userUpdateDto.getPassword());
+            c.setUsername((userUpdateDto.getUsername()));
+            c.setEmail(userUpdateDto.getEmail());
+            c.setDateOfBirth(userUpdateDto.getDateOfBirth());
+            c.setSurname(userUpdateDto.getSurname());
+            return new ResponseEntity(userRepository.save(c), HttpStatus.ACCEPTED);
         }
         else if(userRole.equals("ROLE_CLIENT") )
         {
-            UserUpdateDto clientUpdateObject = userUpdateDto;
-            Optional<User> updatedClient = userRepository.findById(userUpdateDto.getId());
             Client c = (Client) updatedClient.get();
             c.setPassword(userUpdateDto.getPassword());
             c.setUsername((userUpdateDto.getUsername()));
-            // OVO RADI SAMO DORADI KASNIJE
+            c.setEmail(userUpdateDto.getEmail());
+            c.setDateOfBirth(userUpdateDto.getDateOfBirth());
+            c.setSurname(userUpdateDto.getSurname());
 
+            c.setPassportNumber(userUpdateDto.getPassportNumber());
 
             return new ResponseEntity(userRepository.save(c), HttpStatus.ACCEPTED);
         }
         else if(userRole.equals("ROLE_MANAGER"))
         {
-            UserUpdateDto managerUpdateObject = userUpdateDto;
-            Manager updatedManager = new Manager(managerUpdateObject.getUsername(), managerUpdateObject.getPassword(),
-                    managerUpdateObject.getEmail(), managerUpdateObject.getDateOfBirth()
-                    , managerUpdateObject.getName(), managerUpdateObject.getSurname(),
-                    managerUpdateObject.getHireDate(),managerUpdateObject.getCompanyName());
-          return new ResponseEntity(userRepository.save(updatedManager), HttpStatus.ACCEPTED);
+           Manager c = (Manager) updatedClient.get();
+            c.setPassword(userUpdateDto.getPassword());
+            c.setUsername((userUpdateDto.getUsername()));
+            c.setEmail(userUpdateDto.getEmail());
+            c.setDateOfBirth(userUpdateDto.getDateOfBirth());
+            c.setSurname(userUpdateDto.getSurname());
+
+            c.setCompanyName(userUpdateDto.getCompanyName());
+
+          return new ResponseEntity(userRepository.save(c), HttpStatus.ACCEPTED);
         }
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }

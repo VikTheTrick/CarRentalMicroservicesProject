@@ -6,7 +6,7 @@ import com.example.userservice.dtos.userUpdate.UserUpdateDto;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
-    ClientCreateDto addClient(ClientCreateDto clientCreateDto);
+    ResponseEntity<ClientCreateDto> addClient(ClientCreateDto clientCreateDto);
     boolean addManager(ManagerCreateDto managerCreateDto);
     ResponseEntity restrictUser(String email);
     TokenResponseDto login(TokenRequestDto tokenRequestDto);

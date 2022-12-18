@@ -1,5 +1,6 @@
 package com.example.userservice.mapper;
 
+import com.example.userservice.domain.Rank;
 import com.example.userservice.domain.userTypes.Client;
 import com.example.userservice.domain.userTypes.Manager;
 import com.example.userservice.dtos.ClientCreateDto;
@@ -11,7 +12,7 @@ public class UserMapper {
     public Client CreateClientDtoToClient(ClientCreateDto clientCreateDto)
     {
         return new Client(clientCreateDto.getUsername(), clientCreateDto.getPassword(), clientCreateDto.getEmail(), clientCreateDto.getDateOfBirth(),
-                clientCreateDto.getName(), clientCreateDto.getSurname(), clientCreateDto.getPassportNumber(), clientCreateDto.getDaysRented());
+                clientCreateDto.getName(), clientCreateDto.getSurname(), clientCreateDto.getPassportNumber(), clientCreateDto.getDaysRented(), clientCreateDto.getRank());
     }
 
     public Manager CreateManagerDtoToManager(ManagerCreateDto managerCreateDto)

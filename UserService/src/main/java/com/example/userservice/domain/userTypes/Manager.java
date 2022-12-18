@@ -1,12 +1,16 @@
 package com.example.userservice.domain.userTypes;
 
 import com.example.userservice.domain.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.sql.Date;
 
+@Getter
+@Setter
 @Entity
 public class Manager extends User {
     private Date hireDate;

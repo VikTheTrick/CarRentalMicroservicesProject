@@ -23,4 +23,8 @@ public abstract class UserCreateDto {
         this.name = name;
         this.surname = surname;
     }
+
+    public UserCreateDto() {
+
+    }
 }
