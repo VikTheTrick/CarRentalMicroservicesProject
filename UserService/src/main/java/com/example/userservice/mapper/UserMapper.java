@@ -1,10 +1,9 @@
 package com.example.userservice.mapper;
 
-import com.example.userservice.domain.Rank;
 import com.example.userservice.domain.userTypes.Client;
 import com.example.userservice.domain.userTypes.Manager;
-import com.example.userservice.dtos.ClientCreateDto;
-import com.example.userservice.dtos.ManagerCreateDto;
+import com.example.userservice.dto.ClientCreateDto;
+import com.example.userservice.dto.ManagerCreateDto;
 import org.springframework.stereotype.Component;
 
 @Component

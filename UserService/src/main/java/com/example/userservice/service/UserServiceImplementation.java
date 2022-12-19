@@ -1,28 +1,31 @@
 package com.example.userservice.service;
 
+import com.example.userservice.client.notificationservice.dto.SendNotificationDto;
 import com.example.userservice.domain.Rank;
 import com.example.userservice.domain.User;
 import com.example.userservice.domain.userTypes.Admin;
 import com.example.userservice.domain.userTypes.Client;
 import com.example.userservice.domain.userTypes.Manager;
-import com.example.userservice.dtos.*;
-import com.example.userservice.dtos.userUpdate.UserUpdateDto;
+import com.example.userservice.dto.*;
+import com.example.userservice.dto.userUpdate.UserUpdateDto;
 import com.example.userservice.exception.NotFoundException;
+import com.example.userservice.listener.MessageHelper;
 import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.repository.RankRepository;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.security.service.TokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.transaction.Transactional;
 import java.sql.Date;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -31,16 +34,28 @@ public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
     private final RankRepository rankRepository;
     private final UserMapper userMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private MessageHelper messageHelper;
+    private RestTemplate notificationServiceRestTemplate;
+    private String sendNotificationDestination;
     private TokenService tokenService;
+    private JmsTemplate jmsTemplate;
+    private HashMap<String,ClientCreateDto> pendingRegistrations;
 
 
-    public UserServiceImplementation(UserRepository userRepository, RankRepository rankRepository, UserMapper userMapper, BCryptPasswordEncoder passwordEncoder, TokenService tokenService) {
+    public UserServiceImplementation(UserRepository userRepository, RankRepository rankRepository, UserMapper userMapper,
+                                     TokenService tokenService, RestTemplate notificationServiceRestTemplate,
+                                     @Value("${destination.sendNotification}") String sendNotificationDestination,
+                                     JmsTemplate jmsTemplate, MessageHelper messageHelper
+                                     ) {
         this.userRepository = userRepository;
         this.rankRepository = rankRepository;
         this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.messageHelper = messageHelper;
+        this.pendingRegistrations = new HashMap<>();
+        this.notificationServiceRestTemplate = notificationServiceRestTemplate;
+        this.sendNotificationDestination = sendNotificationDestination;
+        this.jmsTemplate = jmsTemplate;
         User a = userRepository.getAllByEmail("m@gmail.com");
         if(a == null)
         userRepository.save(new Admin("mare","123","m@gmail.com",Date.valueOf("2001-2-22"),"marko", "lekic"));
@@ -48,35 +63,53 @@ public class UserServiceImplementation implements UserService {
 
 
     @Override
-    public ResponseEntity<ClientCreateDto> addClient(ClientCreateDto clientCreateDto) {
-       /* User check = userRepository.getAllByEmail(clientCreateDto.getEmail());
-        if(check != null)
-        {
-            return false;
-        }
-        //posalji mejl preko notification servisa
-        */
-        clientCreateDto.setRank(rankRepository.getByName("rank0").get());
+    public ResponseEntity addClient(ClientCreateDto clientCreateDto) {
 
-        try {
-            userRepository.save(userMapper.CreateClientDtoToClient(clientCreateDto));
-            return new ResponseEntity<>(clientCreateDto,HttpStatus.ACCEPTED);
-        }catch (Exception e)
-        {
-            return new ResponseEntity<>(new ClientCreateDto(), HttpStatus.BAD_REQUEST);
-        }
+        clientCreateDto.setRank(rankRepository.getByName("rank0").get());
+        // Generate a random UUID
+        UUID uuid = UUID.randomUUID();
+        String uniqueKey = uuid.toString();
+        pendingRegistrations.put(uniqueKey,clientCreateDto);
+        // send email to notification service
+        jmsTemplate.convertAndSend(sendNotificationDestination, messageHelper.createTextMessage(
+                new SendNotificationDto(clientCreateDto.getEmail(), "posalji,ok","registerNotification")
+        ));
+
+        return new ResponseEntity("Account conformation email has been sent",HttpStatus.OK);
         }
 
     @Override
-    public boolean addManager(ManagerCreateDto managerCreateDto) {
+    public ResponseEntity verifyClient(String clientToken) {
+        try {
+            if(!(pendingRegistrations.containsKey(clientToken)))
+                return new ResponseEntity("Please send the registration request",HttpStatus.NOT_FOUND);
+            Client client = userMapper.CreateClientDtoToClient(pendingRegistrations.get(clientToken));
+            userRepository.save(client);
+            ClientCreateDto cDto = pendingRegistrations.get(clientToken);
+            pendingRegistrations.remove(clientToken);
+            return new ResponseEntity<>("You have verified you account email-address "+ cDto.getEmail(), HttpStatus.CREATED);
+        }catch (Exception e)
+        {
+            return new ResponseEntity<>("Error", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public void test() {
+        JmsTemplate s = jmsTemplate;
+        int a = 4;
+    }
+
+    @Override
+    public ResponseEntity<ManagerCreateDto> addManager(ManagerCreateDto managerCreateDto) {
         User check = userRepository.getAllByEmail(managerCreateDto.getEmail());
         if(check != null)
         {
-            return false;
+            new ResponseEntity<>("err", HttpStatus.BAD_REQUEST);
         }
         managerCreateDto.setPassword(managerCreateDto.getPassword());
         userRepository.save(userMapper.CreateManagerDtoToManager(managerCreateDto));
-        return true;
+        return new ResponseEntity<>(managerCreateDto, HttpStatus.CREATED);
     }
 
     @Override
@@ -87,7 +120,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public TokenResponseDto login(TokenRequestDto tokenRequestDto) {
+    public ResponseEntity<TokenResponseDto> login(TokenRequestDto tokenRequestDto) {
         //Try to find active user for specified credentials
         User user = userRepository
                 .getUserByEmailAndPassword(tokenRequestDto.getEmail(), tokenRequestDto.getPassword())
@@ -95,14 +128,14 @@ public class UserServiceImplementation implements UserService {
                         .format("User with username: %s and password: %s not found.", tokenRequestDto.getEmail(),
                                 tokenRequestDto.getPassword())));
         if(user.getRestricted())
-            return new TokenResponseDto("This account has been restricted");
+            return new ResponseEntity<>(new TokenResponseDto("err"), HttpStatus.BAD_REQUEST);
         //Create token payload
         Claims claims = Jwts.claims();
         claims.put("id", user.getId());
         String userRole = "ROLE_" + user.getClass().getSimpleName().toUpperCase(Locale.ROOT);
         claims.put("role", userRole);
         //Generate token
-        return new TokenResponseDto(tokenService.generate(claims));
+        return new ResponseEntity<>(new TokenResponseDto(tokenService.generate(claims)), HttpStatus.OK);
     }
 
     @Override
@@ -152,7 +185,7 @@ public class UserServiceImplementation implements UserService {
 
           return new ResponseEntity(userRepository.save(c), HttpStatus.ACCEPTED);
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity("error",HttpStatus.BAD_REQUEST);
     }
 
     @Override
@@ -173,6 +206,8 @@ public class UserServiceImplementation implements UserService {
         }
 
     }
+
+
 
 
 }

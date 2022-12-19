@@ -1,16 +1,17 @@
 package com.example.userservice.service;
 
-import com.example.userservice.domain.Rank;
-import com.example.userservice.dtos.*;
-import com.example.userservice.dtos.userUpdate.UserUpdateDto;
+import com.example.userservice.dto.*;
+import com.example.userservice.dto.userUpdate.UserUpdateDto;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
     ResponseEntity<ClientCreateDto> addClient(ClientCreateDto clientCreateDto);
-    boolean addManager(ManagerCreateDto managerCreateDto);
+    ResponseEntity<ManagerCreateDto> addManager(ManagerCreateDto managerCreateDto);
     ResponseEntity restrictUser(String email);
-    TokenResponseDto login(TokenRequestDto tokenRequestDto);
+    ResponseEntity<TokenResponseDto> login(TokenRequestDto tokenRequestDto);
     ResponseEntity updateUser(String userId, UserUpdateDto userUpdateDto);
     ResponseEntity addRank(AddRankDto addRankDto);
+    ResponseEntity verifyClient(String clientToken);
+    void test();
 
 }

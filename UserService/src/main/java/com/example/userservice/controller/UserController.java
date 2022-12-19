@@ -1,7 +1,7 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dtos.*;
-import com.example.userservice.dtos.userUpdate.UserUpdateDto;
+import com.example.userservice.dto.*;
+import com.example.userservice.dto.userUpdate.UserUpdateDto;
 import com.example.userservice.security.CheckSecurity;
 import com.example.userservice.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -24,15 +24,24 @@ public class UserController {
     {
         return new ResponseEntity(userService.addClient(clientCreateDtoCreateDto), HttpStatus.CREATED);
     }
-    @PostMapping("/registerManager")
-    public ResponseEntity<ClientCreateDto> add(@RequestBody ManagerCreateDto managerCreateDtoCreateDto)
+
+    @ApiOperation(value = "Verify client email")
+    @GetMapping(value="verify/{registrationKey}")
+    public ResponseEntity verifyClient(@PathVariable(value = "registrationKey") String registrationKey)
     {
-        return new ResponseEntity(userService.addManager(managerCreateDtoCreateDto), HttpStatus.CREATED);
+       return userService.verifyClient(registrationKey);
     }
+
+    @PostMapping("/registerManager")
+    public ResponseEntity<ManagerCreateDto> add(@RequestBody ManagerCreateDto managerCreateDtoCreateDto)
+    {
+        return userService.addManager(managerCreateDtoCreateDto);
+    }
+
     @ApiOperation(value = "Login")
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> loginUser(@RequestBody TokenRequestDto tokenRequestDto) {
-        return new ResponseEntity<>(userService.login(tokenRequestDto), HttpStatus.OK);
+        return userService.login(tokenRequestDto);
     }
 
     @ApiOperation(value = "restrict")
@@ -40,7 +49,7 @@ public class UserController {
     @CheckSecurity(roles = {"ROLE_ADMIN"})
     public ResponseEntity restrictUser(@RequestHeader("Authorization") String authorization,@PathVariable(value="email") String email)
     {
-        return new ResponseEntity<>(userService.restrictUser(email), HttpStatus.OK);
+        return userService.restrictUser(email);
     }
 
     @ApiOperation(value = "update user params")
@@ -56,6 +65,13 @@ public class UserController {
     public ResponseEntity addRank(@RequestHeader("Authorization") String authorization, @RequestBody AddRankDto addRankDto )
     {
         return userService.addRank(addRankDto);
+    }
+
+    @GetMapping("/test")
+    public String test()
+    {
+        userService.test();
+        return "sss";
     }
 
 }

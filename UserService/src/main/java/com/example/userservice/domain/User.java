@@ -14,7 +14,7 @@ import java.sql.Date;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class User{
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Long id;
 
 
