@@ -24,4 +24,9 @@ public class Notification {
     private NotificationType notificationType;
 
 
+    public Notification(String userId, String params, NotificationType notificationType) {
+        this.userId = userId;
+        this.params = params;
+        this.notificationType = notificationType;
+    }
 }

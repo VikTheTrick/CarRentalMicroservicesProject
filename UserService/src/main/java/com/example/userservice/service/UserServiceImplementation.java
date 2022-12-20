@@ -40,6 +40,7 @@ public class UserServiceImplementation implements UserService {
     private TokenService tokenService;
     private JmsTemplate jmsTemplate;
     private HashMap<String,ClientCreateDto> pendingRegistrations;
+    private String serverBaseUrl = "http://localhost:8081/api/user/";
 
 
     public UserServiceImplementation(UserRepository userRepository, RankRepository rankRepository, UserMapper userMapper,
@@ -71,8 +72,10 @@ public class UserServiceImplementation implements UserService {
         String uniqueKey = uuid.toString();
         pendingRegistrations.put(uniqueKey,clientCreateDto);
         // send email to notification service
+        String params ="";
+        params+=serverBaseUrl+"verify/"+uniqueKey;
         jmsTemplate.convertAndSend(sendNotificationDestination, messageHelper.createTextMessage(
-                new SendNotificationDto(clientCreateDto.getEmail(), "posalji,ok","registerNotification")
+                new SendNotificationDto(clientCreateDto.getEmail(), params,"activation")
         ));
 
         return new ResponseEntity("Account conformation email has been sent",HttpStatus.OK);
