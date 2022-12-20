@@ -94,6 +94,12 @@
             <artifactId>spring-security-crypto</artifactId>
             <version>5.7.5</version>
         </dependency>
+        <dependency>
+            <groupId>alekcz</groupId>
+            <artifactId>googlecredentials</artifactId>
+            <version>3.0.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -112,5 +118,12 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>clojars</id>
+            <name>Clojars</name>
+            <url>https://repo.clojars.org/</url>
+        </repository>
+    </repositories>
 
 </project>

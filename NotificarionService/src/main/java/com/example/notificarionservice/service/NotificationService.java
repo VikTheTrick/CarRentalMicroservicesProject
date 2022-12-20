@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -22,8 +23,32 @@ public class NotificationService implements INotificationService {
 
     public ResponseEntity sendNotification(SendNotificationDto sendNotificationDto)
     {
-        emailService.send( "viktor@gmail.com", "blabla", "Test");
-        int a = 5;
+        ArrayList<String> recipients = new ArrayList<>();
+        String subject = "Test";
+        String body = "Body";
+        try {
+            if(sendNotificationDto.getNotificationType().equals("activation"))
+            {
+                //registration notification
+            }
+            else if(sendNotificationDto.getNotificationType().equals("changePassword"))
+            {
+                    // changed password notification
+            }
+            else if(sendNotificationDto.getNotificationType().equals("cancelReservation"))
+            {
+                //cancel reservation notification
+            }
+            else if(sendNotificationDto.getNotificationType().equals("reminder"))
+            {
+                //reminder notification
+            }
+
+            emailService.sendEmail(recipients, subject, body);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         return new ResponseEntity("Notifikacija je poslata",HttpStatus.CREATED);
     }
 }
