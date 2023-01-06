@@ -98,6 +98,52 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public ResponseEntity<RentalResponseDto> getRentalInfoById(Long id) {
+        try {
+            User user = userRepository.custumFindById(id);
+            if(user == null)
+                return new ResponseEntity("User with that id does not exist", HttpStatus.NOT_FOUND);
+
+            if( user instanceof Client)
+            {
+                Client c = (Client) user;
+                RentalResponseDto response = new RentalResponseDto(c.getEmail(),c.getRank().getDiscount());
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+
+            return new ResponseEntity("Bad request", HttpStatus.BAD_REQUEST);
+
+        } catch (Exception e)
+        {
+            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public ResponseEntity changeDaysRented(ChangeDaysRentedDto changeDaysRentedDto) {
+        try {
+            Optional<User> u = userRepository.findById(changeDaysRentedDto.getUserId());
+            User user = u.get();
+            if (user == null)
+                return new ResponseEntity("User with that id not found", HttpStatus.NOT_FOUND);
+            if(user instanceof Client)
+            {
+                Client client = (Client) user;
+
+                if(client.getDaysRented() + changeDaysRentedDto.getDaysRented() >= 0)
+                client.setDaysRented(client.getDaysRented() + changeDaysRentedDto.getDaysRented());
+                else
+                    return new ResponseEntity("Can not set days_rented below zero", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(client.getDaysRented(),HttpStatus.OK);
+            }
+            return new ResponseEntity("Id you provided does not belong to any client", HttpStatus.BAD_REQUEST);
+        }catch (Exception e)
+        {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Override
     public void test() {
         JmsTemplate s = jmsTemplate;
         int a = 4;
@@ -108,7 +154,7 @@ public class UserServiceImplementation implements UserService {
         User check = userRepository.getAllByEmail(managerCreateDto.getEmail());
         if(check != null)
         {
-            new ResponseEntity<>("err", HttpStatus.BAD_REQUEST);
+            new ResponseEntity<>("Error, manager alredy exists", HttpStatus.BAD_REQUEST);
         }
         managerCreateDto.setPassword(managerCreateDto.getPassword());
         userRepository.save(userMapper.CreateManagerDtoToManager(managerCreateDto));

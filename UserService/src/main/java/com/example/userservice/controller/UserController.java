@@ -66,6 +66,19 @@ public class UserController {
     {
         return userService.addRank(addRankDto);
     }
+    @ApiOperation(value = "get discount and email from user id")
+    @GetMapping("/getRentalInfo/{id}")
+    public ResponseEntity<RentalResponseDto> getRentalInfoById(@PathVariable (value = "id") Long id)
+    {
+        return userService.getRentalInfoById(id);
+    }
+
+    @ApiOperation(value =  "change rental days")
+    @PostMapping("/changeRentalDays")
+    public ResponseEntity changeRentalDays(@RequestBody ChangeDaysRentedDto changeDaysRentedDto)
+    {
+        return userService.changeDaysRented(changeDaysRentedDto);
+    }
 
     @GetMapping("/test")
     public String test()

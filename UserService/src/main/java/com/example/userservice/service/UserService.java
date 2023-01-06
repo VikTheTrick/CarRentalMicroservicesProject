@@ -12,6 +12,8 @@ public interface UserService {
     ResponseEntity updateUser(String userId, UserUpdateDto userUpdateDto);
     ResponseEntity addRank(AddRankDto addRankDto);
     ResponseEntity verifyClient(String clientToken);
+    ResponseEntity<RentalResponseDto> getRentalInfoById(Long id);
+    ResponseEntity changeDaysRented (ChangeDaysRentedDto changeDaysRentedDto);
     void test();
 
 }
