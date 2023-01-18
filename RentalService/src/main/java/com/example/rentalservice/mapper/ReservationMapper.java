@@ -6,9 +6,7 @@ import com.example.rentalservice.model.Reservation;
 import com.example.rentalservice.repository.CompanyVehicleRepository;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
+import java.sql.Date;
 @Component
 public class ReservationMapper {
     private CompanyVehicleRepository companyVehicleRepository;
@@ -31,14 +29,10 @@ public class ReservationMapper {
 
     public Reservation reservationCreateDtoToReservation(ReservationCreateDto reservationCreateDto) {
         Reservation reservation = new Reservation();
-        try {
-            reservation.setFrom(new SimpleDateFormat("dd/MM/yyyy").parse(reservationCreateDto.getFrom()));
-            reservation.setTo(new SimpleDateFormat("dd/MM/yyyy").parse(reservationCreateDto.getTo()));
-            reservation.setVehicle(companyVehicleRepository.findByVehicle_idAndCompany_id(reservationCreateDto.getVehicleid(), reservationCreateDto.getCompanyid())); TODO:
-            reservation.setUserid(reservationCreateDto.getUserid());
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        reservation.setFrom(Date.valueOf(reservationCreateDto.getFrom()));
+        reservation.setTo(Date.valueOf(reservationCreateDto.getTo()));
+        reservation.setVehicle(companyVehicleRepository.findByVehicle_idAndCompany_id(reservationCreateDto.getVehicleid(), reservationCreateDto.getCompanyid()));
+        reservation.setUserid(reservationCreateDto.getUserid());
         return reservation;
     }
 }
