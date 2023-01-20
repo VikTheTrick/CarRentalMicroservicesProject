@@ -56,6 +56,16 @@ public class NotificationService implements INotificationService {
             {
                 //reminder notification
             }
+            else if(sendNotificationDto.getNotificationType().equals("activateReservation"))
+            {
+                recipients.add(sendNotificationDto.getEmail());
+                subject = "Reservation email";
+                body = mapper.createNotificationString(params, curText);
+            }
+            else if(sendNotificationDto.getNotificationType().equals("reminder"))
+            {
+                //reminder notification
+            }
             Notification n = mapper.sendNotificationDtoToNotification(sendNotificationDto, curType);
             notificationRepository.save(n);
             emailService.sendEmail(recipients, subject, body);

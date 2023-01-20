@@ -7,13 +7,12 @@ import lombok.Setter;
 @Setter
 public class ChangeDaysRentedDto {
     private double daysRented;
-    private Long userid;
+    private Long userId;
 
-    public ChangeDaysRentedDto() {
-    }
-
-    public ChangeDaysRentedDto(double daysRented, Long userid) {
+    public ChangeDaysRentedDto(double daysRented, Long userId) {
         this.daysRented = daysRented;
-        this.userid = userid;
+        this.userId = userId;
+    }
+    public ChangeDaysRentedDto() {
     }
 }

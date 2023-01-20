@@ -33,6 +33,8 @@ public class Mapper {
                 foundParam = false;
                 result += ' ';
                 result += params[curParamIndex];
+                result += ' ';
+
                 curParamIndex ++;
                 continue;
             }

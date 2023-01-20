@@ -53,10 +53,11 @@ public class ReservationServiceImplementation implements ReservationService {
         reservation.setPrice(price);
         reservationRepository.save(reservation);
         // sending notification
-        jmsTemplate.convertAndSend(destination,messageHelper.createTextMessage(new SendNotificationDto(discountDtoResponseEntity.getBody().getEmail(),"","activateReservation")));
+        String notification = reservationCreateDto.getVehicleid()+","+reservationCreateDto.getFrom()+","+reservationCreateDto.getTo()+","+ reservationCreateDto.getCompanyid();
+        jmsTemplate.convertAndSend(destination,messageHelper.createTextMessage(new SendNotificationDto(discountDtoResponseEntity.getBody().getEmail(),notification,"activateReservation")));
         // increasing rental days
-        HttpEntity<ChangeDaysRentedDto> updateDaysRented = new HttpEntity<>(new ChangeDaysRentedDto(reservation.getTo().getTime() - reservation.getFrom().getTime(), reservation.getUserid()));
-        ResponseEntity<ChangeDaysRentedDto> update = userServiceRestTemplate.exchange("/user/changeRentalDays",HttpMethod.POST,updateDaysRented,ChangeDaysRentedDto.class);
+        HttpEntity<ChangeDaysRentedDto> updateDaysRented = new HttpEntity<>(new ChangeDaysRentedDto(reservation.getTo().getTime() - reservation.getFrom().getTime(), reservationCreateDto.getUserid()));
+        userServiceRestTemplate.exchange("/user/changeRentalDays",HttpMethod.POST,updateDaysRented,Object.class);
         return reservationMapper.reservationToReservationDto(reservation);
     }
 
@@ -68,10 +69,12 @@ public class ReservationServiceImplementation implements ReservationService {
     @Override
     public void deleteReservation(Long id) {
         Reservation reservation = reservationRepository.findById(id).get();
-        reservationRepository.deleteById(id);
 
+        reservationRepository.deleteById(id);
+        String notification = reservation.getId() +","+reservation.getFrom();
+        ResponseEntity<RentalResponseDto> rentalResponseEntity = userServiceRestTemplate.exchange("/user/getRentalInfo/" + reservation.getUserid(), HttpMethod.GET,null, RentalResponseDto.class);
         // send notification
-        jmsTemplate.convertAndSend(destination,messageHelper.createTextMessage(new SendNotificationDto("","","cancelReservation")));
+        jmsTemplate.convertAndSend(destination,messageHelper.createTextMessage(new SendNotificationDto(rentalResponseEntity.getBody().getEmail(),notification,"cancelReservation")));
 
         // descreasing rental days
         HttpEntity<ChangeDaysRentedDto> updateDaysRented = new HttpEntity<>(new ChangeDaysRentedDto(reservation.getFrom().getTime() - reservation.getTo().getTime(), reservation.getUserid()));

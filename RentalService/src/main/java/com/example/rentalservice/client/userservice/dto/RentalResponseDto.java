@@ -12,4 +12,8 @@ public class RentalResponseDto {
     public RentalResponseDto(String email, Double discount) {
         this.email = email; this.discount = discount;
     }
+    public RentalResponseDto()
+    {
+
+    }
 }

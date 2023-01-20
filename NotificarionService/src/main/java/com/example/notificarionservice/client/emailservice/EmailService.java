@@ -66,7 +66,7 @@ public class EmailService {
                 .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("app");
+        Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("appi");
         return credential;
     }
     public Gmail getGmailService()
