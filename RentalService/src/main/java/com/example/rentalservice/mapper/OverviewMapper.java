@@ -26,10 +26,10 @@ public class OverviewMapper {
         return overviewDto;
     }
 
-    public Overview overviewCreateDtoToOverview(OverviewCreateDto overviewCreateDto) {
+    public Overview overviewCreateDtoToOverview(OverviewCreateDto overviewCreateDto, Long id) {
         Overview overview = new Overview();
         overview.setComment(overviewCreateDto.getComment());
-        overview.setUserid(overviewCreateDto.getUserid());
+        overview.setUserid(id);
         overview.setGrade(overviewCreateDto.getGrade());
         overview.setCompany(companyRepository.findById(overviewCreateDto.getCompanyid()).get());
         return overview;

@@ -19,7 +19,7 @@ public class CatalogController {
         this.catalogService = catalogService;
     }
 
-    @GetMapping
+    @PostMapping
     public ResponseEntity<Page<CompanyVehicleDto>> findAll(@RequestBody PeriodDto periodDto, @ApiIgnore Pageable pageable){
         return new ResponseEntity<>(catalogService.findAll(periodDto, pageable), HttpStatus.OK);
     }

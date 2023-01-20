@@ -37,4 +37,9 @@ public class VehicleServiceImplementation implements VehicleService {
     public Page<VehicleDto> findAll(Pageable pageable) {
         return vehicleRepository.findAll(pageable).map(vehicleMapper::vehicleToVehicleDto);
     }
+
+    @Override
+    public Page<VehicleDto> findByTypeid(Long typeid, Pageable pageable) {
+        return vehicleRepository.findByType_id(typeid,pageable).map(vehicleMapper::vehicleToVehicleDto);
+    }
 }

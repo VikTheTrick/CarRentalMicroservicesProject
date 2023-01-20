@@ -34,8 +34,8 @@ public class OverviewServiceImplementation implements OverviewService {
     }
 
     @Override
-    public OverviewDto addOverview(OverviewCreateDto overviewCreateDto) {
-        Overview overview = overviewMapper.overviewCreateDtoToOverview(overviewCreateDto);
+    public OverviewDto addOverview(OverviewCreateDto overviewCreateDto, Long id) {
+        Overview overview = overviewMapper.overviewCreateDtoToOverview(overviewCreateDto, id);
         Company company = companyRepository.findById(overviewCreateDto.getCompanyid()).get();
         company.setNumberOfGrades(company.getNumberOfGrades() + 1);
         company.setSumOfGrades(company.getSumOfGrades() + overviewCreateDto.getGrade());

@@ -27,19 +27,19 @@ public class CompanyVehicleController {
     }
 
     @GetMapping("/{id}")
-    @CheckSecurity(roles = {"ROLE_MANAGER"})
+    @CheckSecurity(roles = {"ROLE_MANAGER","ROLE_ADMIN"})
     public ResponseEntity<Page<CompanyVehicleDto>> findByCompany(@RequestHeader("Authorization") String authorization, @PathVariable("id") Long id, @ApiIgnore Pageable pageable) {
         return new ResponseEntity<>(companyVehicleService.findByCompany_id(id,pageable),HttpStatus.OK);
     }
 
     @PostMapping
-    @CheckSecurity(roles = {"ROLE_MANAGER"})
+    @CheckSecurity(roles = {"ROLE_MANAGER", "ROLE_ADMIN"})
     public ResponseEntity<CompanyVehicleDto> addCompanyVehicle(@RequestHeader("Authorization") String authorization, @RequestBody CompanyVehicleCreateDto companyVehicleCreateDto){
         return new ResponseEntity<>(companyVehicleService.addCompanyVehicle(companyVehicleCreateDto), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @CheckSecurity(roles = {"ROLE_MANAGER"})
+    @CheckSecurity(roles = {"ROLE_MANAGER", "ROLE_ADMIN"})
     public ResponseEntity<?> deleteCompanyVehicle(@RequestHeader("Authorization") String authorization, @PathVariable("id") Long id) {
         companyVehicleService.deleteCompanyVehicle(id);
         return new ResponseEntity<>(HttpStatus.OK);

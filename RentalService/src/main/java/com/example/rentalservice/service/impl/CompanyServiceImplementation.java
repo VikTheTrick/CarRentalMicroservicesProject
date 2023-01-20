@@ -36,4 +36,9 @@ public class CompanyServiceImplementation implements CompanyService {
     public Page<CompanyDto> findAll(Pageable pageable) {
         return companyRepository.findAll(pageable).map(companyMapper::companyToCompanyDto);
     }
+
+    @Override
+    public CompanyDto findById(Long id) {
+        return companyMapper.companyToCompanyDto(companyRepository.findById(id).get());
+    }
 }

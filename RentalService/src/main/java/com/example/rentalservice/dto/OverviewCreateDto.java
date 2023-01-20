@@ -10,7 +10,6 @@ import javax.validation.constraints.Min;
 @Setter
 public class OverviewCreateDto {
     private Long companyid;
-    private Long userid;
     @Min(1)
     @Max(5)
     private int grade;
@@ -19,9 +18,8 @@ public class OverviewCreateDto {
     public OverviewCreateDto() {
     }
 
-    public OverviewCreateDto(Long companyid, Long userid, int grade, String comment) {
+    public OverviewCreateDto(Long companyid, int grade, String comment) {
         this.companyid = companyid;
-        this.userid = userid;
         this.grade = grade;
         this.comment = comment;
     }

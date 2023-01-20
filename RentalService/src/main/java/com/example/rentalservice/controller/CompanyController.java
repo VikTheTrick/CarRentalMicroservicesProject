@@ -28,6 +28,12 @@ public class CompanyController {
         return new ResponseEntity<>(companyService.findAll(pageable), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    @CheckSecurity(roles={"ROLE_ADMIN"})
+    public ResponseEntity<CompanyDto> findById(@RequestHeader("Authorization") String authorization,@PathVariable("id") Long id){
+        return new ResponseEntity<>(companyService.findById(id), HttpStatus.OK);
+    }
+
     @PostMapping
     @CheckSecurity(roles = {"ROLE_CLIENT", "ROLE_ADMIN"})
     public ResponseEntity<CompanyDto> addCompany(@RequestHeader("Authorization") String authorization, @RequestBody CompanyCreateDto companyCreateDto){

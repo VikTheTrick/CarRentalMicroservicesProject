@@ -10,4 +10,5 @@ public interface CompanyService {
     void deleteCompany(Long id);
 
     Page<CompanyDto> findAll(Pageable pageable);
+    CompanyDto findById(Long id);
 }

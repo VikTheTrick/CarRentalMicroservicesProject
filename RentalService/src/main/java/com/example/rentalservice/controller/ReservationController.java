@@ -3,7 +3,9 @@ package com.example.rentalservice.controller;
 import com.example.rentalservice.dto.ReservationCreateDto;
 import com.example.rentalservice.dto.ReservationDto;
 import com.example.rentalservice.security.CheckSecurity;
+import com.example.rentalservice.security.service.TokenService;
 import com.example.rentalservice.service.ReservationService;
+import io.jsonwebtoken.Claims;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,8 +18,10 @@ import springfox.documentation.annotations.ApiIgnore;
 public class ReservationController {
 
     private ReservationService reservationService;
-    public ReservationController(ReservationService reservationService) {
+    private TokenService tokenService;
+    public ReservationController(ReservationService reservationService, TokenService tokenService) {
         this.reservationService = reservationService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping
@@ -25,10 +29,25 @@ public class ReservationController {
     public ResponseEntity<Page<ReservationDto>> findAll(@RequestHeader("Authorization") String authorization,@ApiIgnore Pageable pageable){
         return new ResponseEntity<>(reservationService.findAll(pageable), HttpStatus.OK);
     }
+    @GetMapping("/{id}")
+    @CheckSecurity(roles={"ROLE_ADMIN"})
+    public ResponseEntity<Page<ReservationDto>> findByUserid(@RequestHeader("Authorization") String authorization,@PathVariable("id") Long id, @ApiIgnore Pageable pageable){
+        return new ResponseEntity<>(reservationService.findByUserid(id, pageable), HttpStatus.OK);
+    }
+
+    @GetMapping("/company/{id}")
+    @CheckSecurity(roles={"ROLE_ADMIN"})
+    public ResponseEntity<Page<ReservationDto>> findByCompanyId(@RequestHeader("Authorization") String authorization,@PathVariable("id") Long id, @ApiIgnore Pageable pageable){
+        return new ResponseEntity<>(reservationService.findByCompanyId(id, pageable), HttpStatus.OK);
+    }
     @PostMapping
     @CheckSecurity(roles = {"ROLE_CLIENT","ROLE_ADMIN"})
     public ResponseEntity<ReservationDto> addReservation(@RequestHeader("Authorization") String authorization, @RequestBody ReservationCreateDto reservationCreateDto){
-        return new ResponseEntity<>(reservationService.addReservation(reservationCreateDto), HttpStatus.OK);
+        Claims claims = tokenService.parseToken(authorization);
+        Long id;
+        if(claims != null)id = Long.parseLong(claims.getId());
+        else id = 1L;
+        return new ResponseEntity<>(reservationService.addReservation(reservationCreateDto,id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

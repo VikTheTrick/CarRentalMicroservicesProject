@@ -26,6 +26,11 @@ public class VehicleController {
     public ResponseEntity<Page<VehicleDto>> findAll(@RequestHeader("Authorization") String authorization,@ApiIgnore Pageable pageable){
         return new ResponseEntity<>(vehicleService.findAll(pageable), HttpStatus.OK);
     }
+    @GetMapping("/{id}")
+    @CheckSecurity(roles={"ROLE_ADMIN"})
+    public ResponseEntity<Page<VehicleDto>> findByType(@RequestHeader("Authorization") String authorization,@PathVariable("id") Long id, @ApiIgnore Pageable pageable){
+        return new ResponseEntity<>(vehicleService.findByTypeid(id, pageable), HttpStatus.OK);
+    }
     @PostMapping
     @CheckSecurity(roles = {"ROLE_ADMIN"})
     public ResponseEntity<VehicleDto> addVehicle(@RequestHeader("Authorization") String authorization, @RequestBody VehicleCreateDto vehicleCreateDto){

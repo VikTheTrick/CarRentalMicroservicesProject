@@ -27,12 +27,12 @@ public class ReservationMapper {
         return reservationDto;
     }
 
-    public Reservation reservationCreateDtoToReservation(ReservationCreateDto reservationCreateDto) {
+    public Reservation reservationCreateDtoToReservation(ReservationCreateDto reservationCreateDto, Long id) {
         Reservation reservation = new Reservation();
         reservation.setFrom(Date.valueOf(reservationCreateDto.getFrom()));
         reservation.setTo(Date.valueOf(reservationCreateDto.getTo()));
         reservation.setVehicle(companyVehicleRepository.findByVehicle_idAndCompany_id(reservationCreateDto.getVehicleid(), reservationCreateDto.getCompanyid()));
-        reservation.setUserid(reservationCreateDto.getUserid());
+        reservation.setUserid(id);
         return reservation;
     }
 }

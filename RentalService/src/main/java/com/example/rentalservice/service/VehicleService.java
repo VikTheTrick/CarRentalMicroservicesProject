@@ -9,4 +9,5 @@ public interface VehicleService {
     VehicleDto addVehicle(VehicleCreateDto reservationCreateDto);
     void deleteVehicle(Long id);
     Page<VehicleDto> findAll(Pageable pageable);
+    Page<VehicleDto> findByTypeid(Long typeid,Pageable pageable);
 }

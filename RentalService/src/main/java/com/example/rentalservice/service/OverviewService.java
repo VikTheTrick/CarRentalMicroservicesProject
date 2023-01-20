@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface OverviewService {
-    OverviewDto addOverview(OverviewCreateDto overviewCreateDto);
+    OverviewDto addOverview(OverviewCreateDto overviewCreateDto, Long id);
 
     OverviewDto updateOverview(Long id, OverviewUpdateDto overviewUpdateDto);
 

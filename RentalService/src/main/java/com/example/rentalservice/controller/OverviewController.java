@@ -5,7 +5,9 @@ import com.example.rentalservice.dto.OverviewCreateDto;
 import com.example.rentalservice.dto.OverviewDto;
 import com.example.rentalservice.dto.OverviewUpdateDto;
 import com.example.rentalservice.security.CheckSecurity;
+import com.example.rentalservice.security.service.TokenService;
 import com.example.rentalservice.service.OverviewService;
+import io.jsonwebtoken.Claims;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,11 @@ import javax.validation.Valid;
 @RequestMapping("/overview")
 public class OverviewController {
     private OverviewService overviewService;
+    private TokenService tokenService;
 
-    public OverviewController(OverviewService overviewService) {
+    public OverviewController(OverviewService overviewService, TokenService tokenService) {
         this.overviewService = overviewService;
+        this.tokenService = tokenService;
     }
 
     @GetMapping
@@ -41,7 +45,10 @@ public class OverviewController {
     @PostMapping
     @CheckSecurity(roles = {"ROLE_CLIENT", "ROLE_ADMIN"})
     public ResponseEntity<OverviewDto> addOverview(@RequestHeader("Authorization") String authorization, @RequestBody @Valid OverviewCreateDto overviewCreateDto){
-        return new ResponseEntity<>(overviewService.addOverview(overviewCreateDto), HttpStatus.OK);
+        Claims claims = tokenService.parseToken(authorization);
+        Long id = Long.parseLong(claims.getId());
+        if(id == null) id = 1L;
+        return new ResponseEntity<>(overviewService.addOverview(overviewCreateDto, id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
