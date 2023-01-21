@@ -73,7 +73,7 @@ public class UserServiceImplementation implements UserService {
         pendingRegistrations.put(uniqueKey,clientCreateDto);
         // send email to notification service
         String params ="";
-        params+=serverBaseUrl+"verify/"+uniqueKey;
+        params+="http://localhost:8084/user-service/api/user/verify/"+uniqueKey;
         jmsTemplate.convertAndSend(sendNotificationDestination, messageHelper.createTextMessage(
                 new SendNotificationDto(clientCreateDto.getEmail(), params,"activation")
         ));

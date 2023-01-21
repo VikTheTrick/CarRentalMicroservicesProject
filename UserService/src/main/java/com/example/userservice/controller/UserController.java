@@ -83,7 +83,6 @@ public class UserController {
     @GetMapping("/test")
     public String test()
     {
-        userService.test();
         return "sss";
     }
 
