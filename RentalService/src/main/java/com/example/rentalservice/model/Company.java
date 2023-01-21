@@ -19,15 +19,17 @@ public class Company {
     private String description;
     private int sumOfGrades;
     private int numberOfGrades;
+    private Long managerId;
 
     public Company() {
     }
 
-    public Company(Long id, String title, String description) {
+    public Company(Long id, String title, String description, Long managerId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.sumOfGrades = 0;
         this.numberOfGrades = 0;
+        this.managerId = managerId;
     }
 }

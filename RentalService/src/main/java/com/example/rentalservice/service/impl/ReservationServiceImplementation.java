@@ -53,6 +53,7 @@ public class ReservationServiceImplementation implements ReservationService {
     @Override
     public ReservationDto addReservation(ReservationCreateDto reservationCreateDto, Long id) {
         // discount from user service
+        System.out.println(id + " id u add");
         ResponseEntity<RentalResponseDto> discountDtoResponseEntity = Retry.decorateSupplier(reservationRetry,()->userServiceRestTemplate.exchange("/user/getRentalInfo/" + id, HttpMethod.GET,null, RentalResponseDto.class)).get();
         // calculating price
         double price = companyVehicleRepository.findByVehicle_idAndCompany_id(reservationCreateDto.getVehicleid(), reservationCreateDto.getCompanyid()).getPrice() / 100 * (100 - discountDtoResponseEntity.getBody().getDiscount());

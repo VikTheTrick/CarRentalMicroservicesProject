@@ -10,12 +10,15 @@ public class CompanyDto {
     private String title;
     private String description;
 
+    private Double prosek;
+
     public CompanyDto() {
     }
 
-    public CompanyDto(Long id, String title, String description) {
+    public CompanyDto(Long id, String title, String description, Double prosek) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.prosek = prosek;
     }
 }

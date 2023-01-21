@@ -45,9 +45,8 @@ public class OverviewController {
     @PostMapping
     @CheckSecurity(roles = {"ROLE_CLIENT", "ROLE_ADMIN"})
     public ResponseEntity<OverviewDto> addOverview(@RequestHeader("Authorization") String authorization, @RequestBody @Valid OverviewCreateDto overviewCreateDto){
-        Claims claims = tokenService.parseToken(authorization);
-        Long id = Long.parseLong(claims.getId());
-        if(id == null) id = 1L;
+        Claims claims = tokenService.parseToken(authorization.split(" ")[1]);
+        Long id = Long.parseLong(claims.get("id").toString());
         return new ResponseEntity<>(overviewService.addOverview(overviewCreateDto, id), HttpStatus.OK);
     }
 

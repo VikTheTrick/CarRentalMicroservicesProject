@@ -43,10 +43,8 @@ public class ReservationController {
     @PostMapping
     @CheckSecurity(roles = {"ROLE_CLIENT","ROLE_ADMIN"})
     public ResponseEntity<ReservationDto> addReservation(@RequestHeader("Authorization") String authorization, @RequestBody ReservationCreateDto reservationCreateDto){
-        Claims claims = tokenService.parseToken(authorization);
-        Long id;
-        if(claims != null)id = Long.parseLong(claims.getId());
-        else id = 1L;
+        Claims claims = tokenService.parseToken(authorization.split(" ")[1]);
+        Long id = Long.parseLong(claims.get("id").toString());
         return new ResponseEntity<>(reservationService.addReservation(reservationCreateDto,id), HttpStatus.OK);
     }
 

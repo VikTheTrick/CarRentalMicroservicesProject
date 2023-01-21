@@ -3,7 +3,9 @@ package com.example.rentalservice.controller;
 import com.example.rentalservice.dto.CompanyCreateDto;
 import com.example.rentalservice.dto.CompanyDto;
 import com.example.rentalservice.security.CheckSecurity;
+import com.example.rentalservice.security.service.TokenService;
 import com.example.rentalservice.service.CompanyService;
+import io.jsonwebtoken.Claims;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,9 +18,11 @@ import springfox.documentation.annotations.ApiIgnore;
 public class CompanyController {
 
     private CompanyService companyService;
+    private TokenService tokenService;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService, TokenService tokenService) {
         this.companyService = companyService;
+        this.tokenService = tokenService;
     }
 
 
@@ -37,7 +41,9 @@ public class CompanyController {
     @PostMapping
     @CheckSecurity(roles = {"ROLE_CLIENT", "ROLE_ADMIN"})
     public ResponseEntity<CompanyDto> addCompany(@RequestHeader("Authorization") String authorization, @RequestBody CompanyCreateDto companyCreateDto){
-        return new ResponseEntity<>(companyService.addCompany(companyCreateDto), HttpStatus.OK);
+        Claims claims = tokenService.parseToken(authorization.split(" ")[1]);
+        Long id = Long.parseLong(claims.get("id").toString());
+        return new ResponseEntity<>(companyService.addCompany(companyCreateDto, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

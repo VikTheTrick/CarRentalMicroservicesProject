@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CompanyService {
-    CompanyDto addCompany(CompanyCreateDto reservationCreateDto);
+    CompanyDto addCompany(CompanyCreateDto reservationCreateDto, Long id);
     void deleteCompany(Long id);
 
     Page<CompanyDto> findAll(Pageable pageable);
