@@ -16,5 +16,6 @@ public class ReservationDto {
     private Date from;
     private Date to;
     private double price;
+    private boolean reminder;
 
 }

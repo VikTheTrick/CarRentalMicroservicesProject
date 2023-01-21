@@ -21,6 +21,7 @@ public class Reservation {
     @Column(name="to_date")
     private Date to;
     private double price;
+    private boolean reminder;
 
     public Reservation() {
     }
@@ -32,5 +33,6 @@ public class Reservation {
         this.from = from;
         this.to = to;
         this.price = price;
+        this.reminder = false;
     }
 }
